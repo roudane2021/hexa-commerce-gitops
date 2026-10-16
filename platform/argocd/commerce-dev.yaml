@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: commerce-dev
+  namespace: argocd                    # les objets Application vivent dans le namespace d'Argo
+  finalizers: [resources-finalizer.argocd.argoproj.io]
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/roudane2021/hexa-commerce-gitops
+    targetRevision: main
+    path: overlays/dev                 # Argo détecte kustomization.yaml et exécute kustomize build
+  destination:
+    server: https://kubernetes.default.svc     # le cluster où tourne Argo CD
+    namespace: commerce-dev
+  syncPolicy:
+    automated:
+      prune: true                      # supprime du cluster ce qui n'est plus dans Git
+      selfHeal: true                   # corrige les modifications manuelles
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
