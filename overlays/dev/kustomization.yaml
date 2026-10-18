@@ -2,49 +2,59 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: commerce-dev
 resources:
-  - ../../base/order-service
-  - ../../base/payment-service
-  - ../../dev-infra/kafka
-  - ../../base/gateway
+- ../../base/order-service
+- ../../base/payment-service
+- ../../dev-infra/kafka
+- ../../base/gateway
 
 patches:
-  - target: { kind: HorizontalPodAutoscaler }
-    patch: |-
-      - op: replace
-        path: /spec/maxReplicas
-        value: 3
-      - op: replace
-        path: /spec/minReplicas
-        value: 1
+- patch: |-
+    - op: replace
+      path: /spec/maxReplicas
+      value: 3
+    - op: replace
+      path: /spec/minReplicas
+      value: 1
+  target:
+    kind: HorizontalPodAutoscaler
 images:
-  - name: ghcr.io/roudane2021/order-service
-    newTag: <sha-d-un-commit-publie>
-  - name: ghcr.io/roudane2021/payment-service
-    newTag: <sha-d-un-commit-publie>
+- name: ghcr.io/roudane2021/order-service
+  newTag: <sha-d-un-commit-publie>
+- name: ghcr.io/roudane2021/payment-service
+  newTag: <sha-d-un-commit-publie>
+- name: order-service
+  newName: ghcr.io/roudane2021/order-service
+  newTag: "2415214"
+- name: payment-service
+  newName: ghcr.io/roudane2021/payment-service
+  newTag: "2415214"
 labels:
-  - pairs: { environment: dev }
-    includeTemplates: true
-configMapGenerator:
-  - name: order-service-config
-    behavior: merge
-    literals:
+- includeTemplates: true
+  pairs:
+    environment: dev
       # - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/orderdb
-      - SPRING_PROFILES_ACTIVE=local
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update       # DEV UNIQUEMENT
-      - SPRING_FLYWAY_ENABLED=false                # DEV UNIQUEMENT
-      - MANAGEMENT_TRACING_SAMPLING_PROBABILITY=1.0
-  - name: payment-service-config
-    behavior: merge
-    literals:
       #  - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paymentdb
-      - SPRING_PROFILES_ACTIVE=local
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_FLYWAY_ENABLED=false
-      - MANAGEMENT_TRACING_SAMPLING_PROBABILITY=1.0
+configMapGenerator:
+- behavior: merge
+  literals:
+  - SPRING_PROFILES_ACTIVE=local
+  - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+  - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  - SPRING_FLYWAY_ENABLED=false
+  - MANAGEMENT_TRACING_SAMPLING_PROBABILITY=1.0
+  name: order-service-config
+- behavior: merge
+  literals:
+  - SPRING_PROFILES_ACTIVE=local
+  - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+  - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  - SPRING_FLYWAY_ENABLED=false
+  - MANAGEMENT_TRACING_SAMPLING_PROBABILITY=1.0
+  name: payment-service-config
 secretGenerator:
-  - name: order-service-secrets
-    envs: [ secrets-order.env ]
-  - name: payment-service-secrets
-    envs: [ secrets-payment.env ]
+- envs:
+  - secrets-order.env
+  name: order-service-secrets
+- envs:
+  - secrets-payment.env
+  name: payment-service-secrets
