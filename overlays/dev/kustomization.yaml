@@ -24,10 +24,10 @@ images:
   newTag: <sha-d-un-commit-publie>
 - name: order-service
   newName: ghcr.io/roudane2021/order-service
-  newTag: 6e65409
+  newTag: 376d73c
 - name: payment-service
   newName: ghcr.io/roudane2021/payment-service
-  newTag: 6e65409
+  newTag: 376d73c
 labels:
 - includeTemplates: true
   pairs:
